@@ -99,21 +99,21 @@ func TestGetState(t *testing.T) {
 	backend.SetStatePending(signature)
 	taskState, err = backend.GetState(signature.UUID)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Name, taskState.TaskName)
+	assert.Equal(t, signature.Id, taskState.TaskName)
 	createdAt := taskState.CreatedAt
 
 	//Received State
 	backend.SetStateReceived(signature)
 	taskState, err = backend.GetState(signature.UUID)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Name, taskState.TaskName)
+	assert.Equal(t, signature.Id, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 
 	//Started State
 	backend.SetStateStarted(signature)
 	taskState, err = backend.GetState(signature.UUID)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Name, taskState.TaskName)
+	assert.Equal(t, signature.Id, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 
 	//Success State
@@ -126,7 +126,7 @@ func TestGetState(t *testing.T) {
 	backend.SetStateSuccess(signature, taskResults)
 	taskState, err = backend.GetState(signature.UUID)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Name, taskState.TaskName)
+	assert.Equal(t, signature.Id, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 	assert.NotNil(t, taskState.Results)
 }

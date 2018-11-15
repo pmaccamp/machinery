@@ -84,7 +84,7 @@ func ProducerOption() opentracing.StartSpanOption {
 // AnnotateSpanWithSignatureInfo ...
 func AnnotateSpanWithSignatureInfo(span opentracing.Span, signature *tasks.Signature) {
 	// tag the span with some info about the signature
-	span.SetTag("signature.name", signature.Name)
+	span.SetTag("signature.name", signature.Id)
 	span.SetTag("signature.uuid", signature.UUID)
 
 	if signature.GroupUUID != "" {

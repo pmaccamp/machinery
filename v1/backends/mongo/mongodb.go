@@ -141,7 +141,7 @@ func (b *Backend) TriggerChord(groupUUID string) (bool, error) {
 func (b *Backend) SetStatePending(signature *tasks.Signature) error {
 	update := bson.M{
 		"state":      tasks.StatePending,
-		"task_name":  signature.Name,
+		"task_name":  signature.Id,
 		"created_at": time.Now().UTC(),
 	}
 	return b.updateState(signature, update)

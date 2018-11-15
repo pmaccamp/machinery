@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	machinery "github.com/RichardKnop/machinery/v1"
+	machinery "github.com/RichardKnop/machinery/src"
 	"github.com/RichardKnop/machinery/v1/config"
 )
 

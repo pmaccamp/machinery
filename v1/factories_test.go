@@ -11,14 +11,14 @@ import (
 	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/stretchr/testify/assert"
 
-	amqpbroker "github.com/RichardKnop/machinery/v1/brokers/amqp"
-	redisbroker "github.com/RichardKnop/machinery/v1/brokers/redis"
-	sqsbroker "github.com/RichardKnop/machinery/v1/brokers/sqs"
+	amqpbroker "github.com/RichardKnop/machinery/src/brokers/amqp"
+	redisbroker "github.com/RichardKnop/machinery/src/brokers/redis"
+	sqsbroker "github.com/RichardKnop/machinery/src/brokers/sqs"
 
-	amqpbackend "github.com/RichardKnop/machinery/v1/backends/amqp"
-	memcachebackend "github.com/RichardKnop/machinery/v1/backends/memcache"
-	mongobackend "github.com/RichardKnop/machinery/v1/backends/mongo"
-	redisbackend "github.com/RichardKnop/machinery/v1/backends/redis"
+	amqpbackend "github.com/RichardKnop/machinery/src/backends/amqp"
+	memcachebackend "github.com/RichardKnop/machinery/src/backends/memcache"
+	mongobackend "github.com/RichardKnop/machinery/src/backends/mongo"
+	redisbackend "github.com/RichardKnop/machinery/src/backends/redis"
 )
 
 var (

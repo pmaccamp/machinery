@@ -42,7 +42,7 @@ type GroupMeta struct {
 func NewPendingTaskState(signature *Signature) *TaskState {
 	return &TaskState{
 		TaskUUID:  signature.UUID,
-		TaskName:  signature.Name,
+		TaskName:  signature.Id,
 		State:     StatePending,
 		CreatedAt: time.Now().UTC(),
 	}

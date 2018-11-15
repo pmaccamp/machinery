@@ -13,8 +13,8 @@ import (
 	"github.com/RichardKnop/machinery/v1/tracing"
 	"github.com/google/uuid"
 
-	backendsiface "github.com/RichardKnop/machinery/v1/backends/iface"
-	brokersiface "github.com/RichardKnop/machinery/v1/brokers/iface"
+	backendsiface "github.com/RichardKnop/machinery/src/backends/iface"
+	brokersiface "github.com/RichardKnop/machinery/src/brokers/iface"
 	opentracing "github.com/opentracing/opentracing-go"
 )
 

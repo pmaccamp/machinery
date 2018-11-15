@@ -44,7 +44,7 @@ func (h Headers) ForeachKey(handler func(key, val string) error) error {
 // Signature represents a single task invocation
 type Signature struct {
 	UUID           string
-	Name           string
+	Id             string
 	RoutingKey     string
 	ETA            *time.Time
 	GroupUUID      string
@@ -60,11 +60,11 @@ type Signature struct {
 }
 
 // NewSignature creates a new task signature
-func NewSignature(name string, args []Arg) (*Signature, error) {
+func NewSignature(id string, args []Arg) (*Signature, error) {
 	signatureID := uuid.New().String()
 	return &Signature{
 		UUID: fmt.Sprintf("task_%v", signatureID),
-		Name: name,
+		Id: id,
 		Args: args,
 	}, nil
 }
