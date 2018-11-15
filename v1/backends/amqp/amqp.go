@@ -163,7 +163,7 @@ func (b *Backend) SetStateSuccess(signature *tasks.Signature, results []*tasks.T
 		return err
 	}
 
-	if signature.GroupUUID == "" {
+	if taskState.TaskUUID == "" {
 		return nil
 	}
 
@@ -178,7 +178,7 @@ func (b *Backend) SetStateFailure(signature *tasks.Signature, err string) error 
 		return err
 	}
 
-	if signature.GroupUUID == "" {
+	if taskState.TaskUUID == "" {
 		return nil
 	}
 
@@ -331,7 +331,7 @@ func (b *Backend) getExpiresIn() int {
 // or groupUUID_failure queue. This is important for GroupCompleted and
 // GroupSuccessful methods
 func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks.TaskState) error {
-	if signature.GroupUUID == "" || signature.GroupTaskCount == 0 {
+	if taskState.TaskUUID == "" {
 		return nil
 	}
 
@@ -352,10 +352,10 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 		b.GetConfig().TLSConfig,
 		b.GetConfig().AMQP.Exchange,     // exchange name
 		b.GetConfig().AMQP.ExchangeType, // exchange type
-		signature.GroupUUID,             // queue name
+		taskState.TaskUUID,              // queue name
 		false,                           // queue durable
 		true,                            // queue delete when unused
-		signature.GroupUUID,             // queue binding key
+		taskState.TaskUUID,              // queue binding key
 		nil,                             // exchange declare args
 		declareQueueArgs,                // queue declare args
 		nil,                             // queue binding args
