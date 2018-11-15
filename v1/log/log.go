@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/pmaccamp/logging"
+	"github.com/RichardKnop/logging"
 )
 
 var (

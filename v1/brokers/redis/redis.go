@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/RichardKnop/redsync"
 	"github.com/gomodule/redigo/redis"
 	"github.com/pmaccamp/machinery/v1/brokers/errs"
 	"github.com/pmaccamp/machinery/v1/brokers/iface"
@@ -14,7 +15,6 @@ import (
 	"github.com/pmaccamp/machinery/v1/config"
 	"github.com/pmaccamp/machinery/v1/log"
 	"github.com/pmaccamp/machinery/v1/tasks"
-	"github.com/pmaccamp/redsync"
 )
 
 var redisDelayedTasksKey = "delayed_tasks"
