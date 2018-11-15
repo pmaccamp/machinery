@@ -14,8 +14,8 @@ import (
 	"github.com/pmaccamp/machinery/v1/tracing"
 
 	opentracing "github.com/opentracing/opentracing-go"
-	backendsiface "github.com/pmaccamp/machinery/src/backends/iface"
-	brokersiface "github.com/pmaccamp/machinery/src/brokers/iface"
+	backendsiface "github.com/pmaccamp/machinery/v1/backends/iface"
+	brokersiface "github.com/pmaccamp/machinery/v1/brokers/iface"
 )
 
 // Server is the main Machinery object and stores all configuration

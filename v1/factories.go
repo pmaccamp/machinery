@@ -10,20 +10,20 @@ import (
 
 	"github.com/pmaccamp/machinery/v1/config"
 
-	amqpbroker "github.com/pmaccamp/machinery/src/brokers/amqp"
-	eagerbroker "github.com/pmaccamp/machinery/src/brokers/eager"
-	gcppubsubbroker "github.com/pmaccamp/machinery/src/brokers/gcppubsub"
-	brokeriface "github.com/pmaccamp/machinery/src/brokers/iface"
-	redisbroker "github.com/pmaccamp/machinery/src/brokers/redis"
-	sqsbroker "github.com/pmaccamp/machinery/src/brokers/sqs"
+	amqpbroker "github.com/pmaccamp/machinery/v1/brokers/amqp"
+	eagerbroker "github.com/pmaccamp/machinery/v1/brokers/eager"
+	gcppubsubbroker "github.com/pmaccamp/machinery/v1/brokers/gcppubsub"
+	brokeriface "github.com/pmaccamp/machinery/v1/brokers/iface"
+	redisbroker "github.com/pmaccamp/machinery/v1/brokers/redis"
+	sqsbroker "github.com/pmaccamp/machinery/v1/brokers/sqs"
 
-	amqpbackend "github.com/pmaccamp/machinery/src/backends/amqp"
-	dynamobackend "github.com/pmaccamp/machinery/src/backends/dynamodb"
-	eagerbackend "github.com/pmaccamp/machinery/src/backends/eager"
-	backendiface "github.com/pmaccamp/machinery/src/backends/iface"
-	memcachebackend "github.com/pmaccamp/machinery/src/backends/memcache"
-	mongobackend "github.com/pmaccamp/machinery/src/backends/mongo"
-	redisbackend "github.com/pmaccamp/machinery/src/backends/redis"
+	amqpbackend "github.com/pmaccamp/machinery/v1/backends/amqp"
+	dynamobackend "github.com/pmaccamp/machinery/v1/backends/dynamodb"
+	eagerbackend "github.com/pmaccamp/machinery/v1/backends/eager"
+	backendiface "github.com/pmaccamp/machinery/v1/backends/iface"
+	memcachebackend "github.com/pmaccamp/machinery/v1/backends/memcache"
+	mongobackend "github.com/pmaccamp/machinery/v1/backends/mongo"
+	redisbackend "github.com/pmaccamp/machinery/v1/backends/redis"
 )
 
 // BrokerFactory creates a new object of iface.Broker

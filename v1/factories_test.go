@@ -11,14 +11,14 @@ import (
 	"github.com/pmaccamp/machinery/v1/config"
 	"github.com/stretchr/testify/assert"
 
-	amqpbroker "github.com/pmaccamp/machinery/src/brokers/amqp"
-	redisbroker "github.com/pmaccamp/machinery/src/brokers/redis"
-	sqsbroker "github.com/pmaccamp/machinery/src/brokers/sqs"
+	amqpbroker "github.com/pmaccamp/machinery/v1/brokers/amqp"
+	redisbroker "github.com/pmaccamp/machinery/v1/brokers/redis"
+	sqsbroker "github.com/pmaccamp/machinery/v1/brokers/sqs"
 
-	amqpbackend "github.com/pmaccamp/machinery/src/backends/amqp"
-	memcachebackend "github.com/pmaccamp/machinery/src/backends/memcache"
-	mongobackend "github.com/pmaccamp/machinery/src/backends/mongo"
-	redisbackend "github.com/pmaccamp/machinery/src/backends/redis"
+	amqpbackend "github.com/pmaccamp/machinery/v1/backends/amqp"
+	memcachebackend "github.com/pmaccamp/machinery/v1/backends/memcache"
+	mongobackend "github.com/pmaccamp/machinery/v1/backends/mongo"
+	redisbackend "github.com/pmaccamp/machinery/v1/backends/redis"
 )
 
 var (
