@@ -213,7 +213,7 @@ func (b *Broker) consumeOne(delivery *pubsub.Message, taskProcessor iface.TaskPr
 
 	// If the task is not registered return an error
 	// and leave the message in the queue
-	if !b.IsTaskRegistered(sig.Id) {
+	if !b.IsTaskRegistered(sig.Task) {
 		delivery.Nack()
 		return fmt.Errorf("task %s is not registered", sig.Id)
 	}

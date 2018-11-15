@@ -159,7 +159,7 @@ func (s *EagerBackendTestSuite) TestGroupTaskStates() {
 				break
 			}
 
-			s.backend.SetStateFailure(t, t.UUID)
+			s.backend.SetStateFailure(t, t.Id)
 		}
 
 		// get states back
@@ -192,7 +192,7 @@ func (s *EagerBackendTestSuite) TestSetStatePending() {
 		// change it back to pending
 		s.backend.SetStatePending(t)
 
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		if st != nil {
 			s.Equal(tasks.StatePending, st.State)
@@ -205,7 +205,7 @@ func (s *EagerBackendTestSuite) TestSetStateReceived() {
 	{
 		t := s.st[1]
 		s.backend.SetStateReceived(t)
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		if st != nil {
 			s.Equal(tasks.StateReceived, st.State)
@@ -218,7 +218,7 @@ func (s *EagerBackendTestSuite) TestSetStateStarted() {
 	{
 		t := s.st[2]
 		s.backend.SetStateStarted(t)
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		if st != nil {
 			s.Equal(tasks.StateStarted, st.State)
@@ -237,7 +237,7 @@ func (s *EagerBackendTestSuite) TestSetStateSuccess() {
 			},
 		}
 		s.backend.SetStateSuccess(t, taskResults)
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		s.NotNil(st)
 
@@ -251,7 +251,7 @@ func (s *EagerBackendTestSuite) TestSetStateFailure() {
 	{
 		t := s.st[4]
 		s.backend.SetStateFailure(t, "error")
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		if st != nil {
 			s.Equal(tasks.StateFailure, st.State)
@@ -265,7 +265,7 @@ func (s *EagerBackendTestSuite) TestSetStateRetry() {
 	{
 		t := s.st[5]
 		s.backend.SetStateRetry(t)
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.Nil(err)
 		if st != nil {
 			s.Equal(tasks.StateRetry, st.State)
@@ -284,15 +284,15 @@ func (s *EagerBackendTestSuite) TestPurgeState() {
 	// task6
 	{
 		t := s.st[5]
-		st, err := s.backend.GetState(t.UUID)
+		st, err := s.backend.GetState(t.Id)
 		s.NotNil(st)
 		s.Nil(err)
 
 		// purge it
-		s.Nil(s.backend.PurgeState(t.UUID))
+		s.Nil(s.backend.PurgeState(t.Id))
 
 		// should be not found
-		st, err = s.backend.GetState(t.UUID)
+		st, err = s.backend.GetState(t.Id)
 		s.Nil(st)
 		s.NotNil(err)
 	}
@@ -331,7 +331,7 @@ func (s *EagerBackendTestSuite) TestPurgeGroupMeta() {
 //
 func (s *EagerBackendTestSuite) getTaskSignature(taskUUID string) *tasks.Signature {
 	for _, v := range s.st {
-		if v.UUID == taskUUID {
+		if v.Id == taskUUID {
 			return v
 		}
 	}

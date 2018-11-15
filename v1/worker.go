@@ -118,18 +118,18 @@ func (worker *Worker) Quit() {
 func (worker *Worker) Process(signature *tasks.Signature) error {
 	// If the task is not registered with this worker, do not continue
 	// but only return nil as we do not want to restart the worker process
-	if !worker.server.IsTaskRegistered(signature.Id) {
+	if !worker.server.IsTaskRegistered(signature.Task) {
 		return nil
 	}
 
-	taskFunc, err := worker.server.GetRegisteredTask(signature.Id)
+	taskFunc, err := worker.server.GetRegisteredTask(signature.Task)
 	if err != nil {
 		return nil
 	}
 
 	// Update task state to RECEIVED
 	if err = worker.server.GetBackend().SetStateReceived(signature); err != nil {
-		return fmt.Errorf("Set state to 'received' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'received' for task %s returned error: %s", signature.Id, err)
 	}
 
 	// Prepare task for processing
@@ -150,7 +150,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 
 	// Update task state to STARTED
 	if err = worker.server.GetBackend().SetStateStarted(signature); err != nil {
-		return fmt.Errorf("Set state to 'started' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'started' for task %s returned error: %s", signature.Id, err)
 	}
 
 	// Call the task
@@ -179,7 +179,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 func (worker *Worker) taskRetry(signature *tasks.Signature) error {
 	// Update task state to RETRY
 	if err := worker.server.GetBackend().SetStateRetry(signature); err != nil {
-		return fmt.Errorf("Set state to 'retry' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'retry' for task %s returned error: %s", signature.Id, err)
 	}
 
 	// Decrement the retry counter, when it reaches 0, we won't retry again
@@ -192,7 +192,7 @@ func (worker *Worker) taskRetry(signature *tasks.Signature) error {
 	eta := time.Now().UTC().Add(time.Second * time.Duration(signature.RetryTimeout))
 	signature.ETA = &eta
 
-	log.WARNING.Printf("Task %s failed. Going to retry in %d seconds.", signature.UUID, signature.RetryTimeout)
+	log.WARNING.Printf("Task %s failed. Going to retry in %d seconds.", signature.Id, signature.RetryTimeout)
 
 	// Send the task back to the queue
 	_, err := worker.server.SendTask(signature)
@@ -203,14 +203,14 @@ func (worker *Worker) taskRetry(signature *tasks.Signature) error {
 func (worker *Worker) retryTaskIn(signature *tasks.Signature, retryIn time.Duration) error {
 	// Update task state to RETRY
 	if err := worker.server.GetBackend().SetStateRetry(signature); err != nil {
-		return fmt.Errorf("Set state to 'retry' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'retry' for task %s returned error: %s", signature.Id, err)
 	}
 
 	// Delay task by retryIn duration
 	eta := time.Now().UTC().Add(retryIn)
 	signature.ETA = &eta
 
-	log.WARNING.Printf("Task %s failed. Going to retry in %.0f seconds.", signature.UUID, retryIn.Seconds())
+	log.WARNING.Printf("Task %s failed. Going to retry in %.0f seconds.", signature.Id, retryIn.Seconds())
 
 	// Send the task back to the queue
 	_, err := worker.server.SendTask(signature)
@@ -222,7 +222,7 @@ func (worker *Worker) retryTaskIn(signature *tasks.Signature, retryIn time.Durat
 func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*tasks.TaskResult) error {
 	// Update task state to SUCCESS
 	if err := worker.server.GetBackend().SetStateSuccess(signature, taskResults); err != nil {
-		return fmt.Errorf("Set state to 'success' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'success' for task %s returned error: %s", signature.Id, err)
 	}
 
 	// Log human readable results of the processed task
@@ -233,7 +233,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 	} else {
 		debugResults = tasks.HumanReadableResults(results)
 	}
-	log.DEBUG.Printf("Processed task %s. Results = %s", signature.UUID, debugResults)
+	log.DEBUG.Printf("Processed task %s. Results = %s", signature.Id, debugResults)
 
 	// Trigger success callbacks
 
@@ -330,13 +330,13 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error) error {
 	// Update task state to FAILURE
 	if err := worker.server.GetBackend().SetStateFailure(signature, taskErr.Error()); err != nil {
-		return fmt.Errorf("Set state to 'failure' for task %s returned error: %s", signature.UUID, err)
+		return fmt.Errorf("Set state to 'failure' for task %s returned error: %s", signature.Id, err)
 	}
 
 	if worker.errorHandler != nil {
 		worker.errorHandler(taskErr)
 	} else {
-		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.UUID, taskErr)
+		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.Id, taskErr)
 	}
 
 	// Trigger error callbacks

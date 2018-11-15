@@ -30,8 +30,8 @@ func TestGroupCompleted(t *testing.T) {
 	backend := memcache.New(new(config.Config), []string{memcacheURL})
 
 	// Cleanup before the test
-	backend.PurgeState(task1.UUID)
-	backend.PurgeState(task2.UUID)
+	backend.PurgeState(task1.Id)
+	backend.PurgeState(task2.Id)
 	backend.PurgeGroupMeta(groupUUID)
 
 	groupCompleted, err := backend.GroupCompleted(groupUUID, 2)
@@ -40,7 +40,7 @@ func TestGroupCompleted(t *testing.T) {
 		assert.Equal(t, "memcache: cache miss", err.Error())
 	}
 
-	backend.InitGroup(groupUUID, []string{task1.UUID, task2.UUID})
+	backend.InitGroup(groupUUID, []string{task1.Id, task2.Id})
 
 	groupCompleted, err = backend.GroupCompleted(groupUUID, 2)
 	if assert.Error(t, err) {
@@ -104,7 +104,7 @@ func TestGetState(t *testing.T) {
 		err       error
 	)
 	for {
-		taskState, err = backend.GetState(signature.UUID)
+		taskState, err = backend.GetState(signature.Id)
 		if taskState == nil {
 			assert.Equal(t, "memcache: cache miss", err.Error())
 			continue
@@ -131,12 +131,12 @@ func TestPurgeState(t *testing.T) {
 	backend := memcache.New(new(config.Config), []string{memcacheURL})
 
 	backend.SetStatePending(signature)
-	taskState, err := backend.GetState(signature.UUID)
+	taskState, err := backend.GetState(signature.Id)
 	assert.NotNil(t, taskState)
 	assert.NoError(t, err)
 
 	backend.PurgeState(taskState.TaskUUID)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.Nil(t, taskState)
 	assert.Error(t, err)
 }

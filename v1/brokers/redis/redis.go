@@ -294,7 +294,7 @@ func (b *Broker) consumeOne(delivery []byte, taskProcessor iface.TaskProcessor) 
 
 	// If the task is not registered, we requeue it,
 	// there might be different workers for processing specific tasks
-	if !b.IsTaskRegistered(signature.Id) {
+	if !b.IsTaskRegistered(signature.Task) {
 		conn := b.open()
 		defer conn.Close()
 

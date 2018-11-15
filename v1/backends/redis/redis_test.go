@@ -30,8 +30,8 @@ func TestGroupCompleted(t *testing.T) {
 	backend := redis.New(new(config.Config), redisURL, redisPassword, "", 0)
 
 	// Cleanup before the test
-	backend.PurgeState(task1.UUID)
-	backend.PurgeState(task2.UUID)
+	backend.PurgeState(task1.Id)
+	backend.PurgeState(task2.Id)
 	backend.PurgeGroupMeta(groupUUID)
 
 	groupCompleted, err := backend.GroupCompleted(groupUUID, 2)
@@ -40,7 +40,7 @@ func TestGroupCompleted(t *testing.T) {
 		assert.Equal(t, "redigo: nil returned", err.Error())
 	}
 
-	backend.InitGroup(groupUUID, []string{task1.UUID, task2.UUID})
+	backend.InitGroup(groupUUID, []string{task1.Id, task2.Id})
 
 	groupCompleted, err = backend.GroupCompleted(groupUUID, 2)
 	if assert.Error(t, err) {
@@ -91,29 +91,29 @@ func TestGetState(t *testing.T) {
 		err       error
 	)
 
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.Equal(t, "redigo: nil returned", err.Error())
 	assert.Nil(t, taskState)
 
 	//Pending State
 	backend.SetStatePending(signature)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Id, taskState.TaskName)
+	assert.Equal(t, signature.Task, taskState.TaskName)
 	createdAt := taskState.CreatedAt
 
 	//Received State
 	backend.SetStateReceived(signature)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Id, taskState.TaskName)
+	assert.Equal(t, signature.Task, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 
 	//Started State
 	backend.SetStateStarted(signature)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Id, taskState.TaskName)
+	assert.Equal(t, signature.Task, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 
 	//Success State
@@ -124,9 +124,9 @@ func TestGetState(t *testing.T) {
 		},
 	}
 	backend.SetStateSuccess(signature, taskResults)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.NoError(t, err)
-	assert.Equal(t, signature.Id, taskState.TaskName)
+	assert.Equal(t, signature.Task, taskState.TaskName)
 	assert.Equal(t, createdAt, taskState.CreatedAt)
 	assert.NotNil(t, taskState.Results)
 }
@@ -146,12 +146,12 @@ func TestPurgeState(t *testing.T) {
 	backend := redis.New(new(config.Config), redisURL, redisPassword, "", 0)
 
 	backend.SetStatePending(signature)
-	taskState, err := backend.GetState(signature.UUID)
+	taskState, err := backend.GetState(signature.Id)
 	assert.NotNil(t, taskState)
 	assert.NoError(t, err)
 
 	backend.PurgeState(taskState.TaskUUID)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.Nil(t, taskState)
 	assert.Error(t, err)
 }

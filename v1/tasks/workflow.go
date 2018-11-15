@@ -28,7 +28,7 @@ type Chord struct {
 func (group *Group) GetUUIDs() []string {
 	taskUUIDs := make([]string, len(group.Tasks))
 	for i, signature := range group.Tasks {
-		taskUUIDs[i] = signature.UUID
+		taskUUIDs[i] = signature.Id
 	}
 	return taskUUIDs
 }
@@ -38,9 +38,9 @@ func (group *Group) GetUUIDs() []string {
 func NewChain(signatures ...*Signature) (*Chain, error) {
 	// Auto generate task UUIDs if needed
 	for _, signature := range signatures {
-		if signature.UUID == "" {
+		if signature.Id == "" {
 			signatureID := uuid.New().String()
-			signature.UUID = fmt.Sprintf("task_%v", signatureID)
+			signature.Id = fmt.Sprintf("task_%v", signatureID)
 		}
 	}
 
@@ -63,9 +63,9 @@ func NewGroup(signatures ...*Signature) (*Group, error) {
 
 	// Auto generate task UUIDs if needed, group tasks by common group UUID
 	for _, signature := range signatures {
-		if signature.UUID == "" {
+		if signature.Id == "" {
 			signatureID := uuid.New().String()
-			signature.UUID = fmt.Sprintf("task_%v", signatureID)
+			signature.Id = fmt.Sprintf("task_%v", signatureID)
 		}
 		signature.GroupUUID = groupID
 		signature.GroupTaskCount = len(signatures)
@@ -80,10 +80,10 @@ func NewGroup(signatures ...*Signature) (*Group, error) {
 // NewChord creates a new chord (a group of tasks with a single callback
 // to be executed after all tasks in the group has completed)
 func NewChord(group *Group, callback *Signature) (*Chord, error) {
-	if callback.UUID == "" {
+	if callback.Id == "" {
 		// Generate a UUID for the chord callback
 		callbackUUID := uuid.New().String()
-		callback.UUID = fmt.Sprintf("chord_%v", callbackUUID)
+		callback.Id = fmt.Sprintf("chord_%v", callbackUUID)
 	}
 
 	// Add a chord callback to all tasks

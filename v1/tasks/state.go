@@ -41,8 +41,8 @@ type GroupMeta struct {
 // NewPendingTaskState ...
 func NewPendingTaskState(signature *Signature) *TaskState {
 	return &TaskState{
-		TaskUUID:  signature.UUID,
-		TaskName:  signature.Id,
+		TaskUUID:  signature.Id,
+		TaskName:  signature.Task,
 		State:     StatePending,
 		CreatedAt: time.Now().UTC(),
 	}
@@ -51,7 +51,7 @@ func NewPendingTaskState(signature *Signature) *TaskState {
 // NewReceivedTaskState ...
 func NewReceivedTaskState(signature *Signature) *TaskState {
 	return &TaskState{
-		TaskUUID: signature.UUID,
+		TaskUUID: signature.Id,
 		State:    StateReceived,
 	}
 }
@@ -59,7 +59,7 @@ func NewReceivedTaskState(signature *Signature) *TaskState {
 // NewStartedTaskState ...
 func NewStartedTaskState(signature *Signature) *TaskState {
 	return &TaskState{
-		TaskUUID: signature.UUID,
+		TaskUUID: signature.Id,
 		State:    StateStarted,
 	}
 }
@@ -67,7 +67,7 @@ func NewStartedTaskState(signature *Signature) *TaskState {
 // NewSuccessTaskState ...
 func NewSuccessTaskState(signature *Signature, results []*TaskResult) *TaskState {
 	return &TaskState{
-		TaskUUID: signature.UUID,
+		TaskUUID: signature.Id,
 		State:    StateSuccess,
 		Results:  results,
 	}
@@ -76,7 +76,7 @@ func NewSuccessTaskState(signature *Signature, results []*TaskResult) *TaskState
 // NewFailureTaskState ...
 func NewFailureTaskState(signature *Signature, err string) *TaskState {
 	return &TaskState{
-		TaskUUID: signature.UUID,
+		TaskUUID: signature.Id,
 		State:    StateFailure,
 		Error:    err,
 	}
@@ -85,7 +85,7 @@ func NewFailureTaskState(signature *Signature, err string) *TaskState {
 // NewRetryTaskState ...
 func NewRetryTaskState(signature *Signature) *TaskState {
 	return &TaskState{
-		TaskUUID: signature.UUID,
+		TaskUUID: signature.Id,
 		State:    StateRetry,
 	}
 }

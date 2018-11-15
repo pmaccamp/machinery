@@ -139,7 +139,7 @@ func (b *Broker) Publish(signature *tasks.Signature) error {
 	// if this is a fifo queue, there needs to be some additional parameters.
 	if strings.HasSuffix(signature.RoutingKey, ".fifo") {
 		// Use Machinery's signature Task UUID as SQS Message Group ID.
-		MsgDedupID := signature.UUID
+		MsgDedupID := signature.Id
 		MsgInput.MessageDeduplicationId = aws.String(MsgDedupID)
 
 		// Use Machinery's signature Group UUID as SQS Message Group ID.
@@ -211,7 +211,7 @@ func (b *Broker) consumeOne(delivery *awssqs.ReceiveMessageOutput, taskProcessor
 
 	// If the task is not registered return an error
 	// and leave the message in the queue
-	if !b.IsTaskRegistered(sig.Id) {
+	if !b.IsTaskRegistered(sig.Task) {
 		return fmt.Errorf("task %s is not registered", sig.Id)
 	}
 

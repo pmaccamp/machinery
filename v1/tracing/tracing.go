@@ -84,16 +84,16 @@ func ProducerOption() opentracing.StartSpanOption {
 // AnnotateSpanWithSignatureInfo ...
 func AnnotateSpanWithSignatureInfo(span opentracing.Span, signature *tasks.Signature) {
 	// tag the span with some info about the signature
-	span.SetTag("signature.name", signature.Id)
-	span.SetTag("signature.uuid", signature.UUID)
+	span.SetTag("signature.name", signature.Task)
+	span.SetTag("signature.uuid", signature.Id)
 
 	if signature.GroupUUID != "" {
-		span.SetTag("signature.group.uuid", signature.UUID)
+		span.SetTag("signature.group.uuid", signature.Id)
 	}
 
 	if signature.ChordCallback != nil {
 		span.SetTag("signature.chord.callback.uuid", signature.ChordCallback.UUID)
-		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Id)
+		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Name)
 	}
 }
 

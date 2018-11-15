@@ -55,8 +55,8 @@ func TestGroupCompleted(t *testing.T) {
 	backend := amqp.New(amqpConfig)
 
 	// Cleanup before the test
-	backend.PurgeState(task1.UUID)
-	backend.PurgeState(task2.UUID)
+	backend.PurgeState(task1.Id)
+	backend.PurgeState(task2.Id)
 	backend.PurgeGroupMeta(groupUUID)
 
 	groupCompleted, err := backend.GroupCompleted(groupUUID, groupTaskCount)
@@ -64,7 +64,7 @@ func TestGroupCompleted(t *testing.T) {
 		assert.False(t, groupCompleted)
 	}
 
-	backend.InitGroup(groupUUID, []string{task1.UUID, task2.UUID})
+	backend.InitGroup(groupUUID, []string{task1.Id, task2.Id})
 
 	groupCompleted, err = backend.GroupCompleted(groupUUID, groupTaskCount)
 	if assert.NoError(t, err) {
@@ -122,7 +122,7 @@ func TestGetState(t *testing.T) {
 		err       error
 	)
 	for {
-		taskState, err = backend.GetState(signature.UUID)
+		taskState, err = backend.GetState(signature.Id)
 		if taskState == nil {
 			assert.Equal(t, "No state ready", err.Error())
 			continue
@@ -149,12 +149,12 @@ func TestPurgeState(t *testing.T) {
 
 	backend.SetStatePending(signature)
 	backend.SetStateReceived(signature)
-	taskState, err := backend.GetState(signature.UUID)
+	taskState, err := backend.GetState(signature.Id)
 	assert.NotNil(t, taskState)
 	assert.NoError(t, err)
 
 	backend.PurgeState(taskState.TaskUUID)
-	taskState, err = backend.GetState(signature.UUID)
+	taskState, err = backend.GetState(signature.Id)
 	assert.Nil(t, taskState)
 	assert.Error(t, err)
 }
