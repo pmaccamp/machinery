@@ -5,12 +5,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/RichardKnop/machinery/v1"
-	"github.com/RichardKnop/machinery/v1/brokers/iface"
-	"github.com/RichardKnop/machinery/v1/brokers/sqs"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/retry"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/pmaccamp/machinery/v1"
+	"github.com/pmaccamp/machinery/v1/brokers/iface"
+	"github.com/pmaccamp/machinery/v1/brokers/sqs"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/retry"
 	"github.com/stretchr/testify/assert"
 
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"

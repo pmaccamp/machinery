@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/RichardKnop/machinery/v1/brokers/errs"
-	"github.com/RichardKnop/machinery/v1/brokers/iface"
-	"github.com/RichardKnop/machinery/v1/common"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/log"
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/pmaccamp/machinery/v1/brokers/errs"
+	"github.com/pmaccamp/machinery/v1/brokers/iface"
+	"github.com/pmaccamp/machinery/v1/common"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/log"
+	"github.com/pmaccamp/machinery/v1/tasks"
 	"github.com/streadway/amqp"
 )
 

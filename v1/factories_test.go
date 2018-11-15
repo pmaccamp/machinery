@@ -7,18 +7,18 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/RichardKnop/machinery/v1"
-	"github.com/RichardKnop/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1"
+	"github.com/pmaccamp/machinery/v1/config"
 	"github.com/stretchr/testify/assert"
 
-	amqpbroker "github.com/RichardKnop/machinery/src/brokers/amqp"
-	redisbroker "github.com/RichardKnop/machinery/src/brokers/redis"
-	sqsbroker "github.com/RichardKnop/machinery/src/brokers/sqs"
+	amqpbroker "github.com/pmaccamp/machinery/src/brokers/amqp"
+	redisbroker "github.com/pmaccamp/machinery/src/brokers/redis"
+	sqsbroker "github.com/pmaccamp/machinery/src/brokers/sqs"
 
-	amqpbackend "github.com/RichardKnop/machinery/src/backends/amqp"
-	memcachebackend "github.com/RichardKnop/machinery/src/backends/memcache"
-	mongobackend "github.com/RichardKnop/machinery/src/backends/mongo"
-	redisbackend "github.com/RichardKnop/machinery/src/backends/redis"
+	amqpbackend "github.com/pmaccamp/machinery/src/backends/amqp"
+	memcachebackend "github.com/pmaccamp/machinery/src/backends/memcache"
+	mongobackend "github.com/pmaccamp/machinery/src/backends/mongo"
+	redisbackend "github.com/pmaccamp/machinery/src/backends/redis"
 )
 
 var (

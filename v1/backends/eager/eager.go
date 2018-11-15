@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/RichardKnop/machinery/v1/backends/iface"
-	"github.com/RichardKnop/machinery/v1/common"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/pmaccamp/machinery/v1/backends/iface"
+	"github.com/pmaccamp/machinery/v1/common"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/tasks"
 )
 
 // ErrGroupNotFound ...

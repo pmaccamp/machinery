@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/RichardKnop/machinery/v1/backends/iface"
-	"github.com/RichardKnop/machinery/v1/common"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/log"
-	"github.com/RichardKnop/machinery/v1/tasks"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
+	"github.com/pmaccamp/machinery/v1/backends/iface"
+	"github.com/pmaccamp/machinery/v1/common"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/log"
+	"github.com/pmaccamp/machinery/v1/tasks"
 )
 
 // Backend ...
@@ -385,10 +385,10 @@ func (b *Backend) setTaskState(taskState *tasks.TaskState) error {
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeNames:  expAttributeNames,
 		ExpressionAttributeValues: expAttributeValues,
-		Key:                       keyAttributeValues,
-		ReturnValues:              aws.String("UPDATED_NEW"),
-		TableName:                 aws.String(b.cnf.DynamoDB.TaskStatesTable),
-		UpdateExpression:          aws.String(exp),
+		Key:              keyAttributeValues,
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		TableName:        aws.String(b.cnf.DynamoDB.TaskStatesTable),
+		UpdateExpression: aws.String(exp),
 	}
 
 	_, err := b.client.UpdateItem(input)

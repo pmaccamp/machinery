@@ -8,22 +8,22 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/RichardKnop/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/config"
 
-	amqpbroker "github.com/RichardKnop/machinery/src/brokers/amqp"
-	eagerbroker "github.com/RichardKnop/machinery/src/brokers/eager"
-	gcppubsubbroker "github.com/RichardKnop/machinery/src/brokers/gcppubsub"
-	brokeriface "github.com/RichardKnop/machinery/src/brokers/iface"
-	redisbroker "github.com/RichardKnop/machinery/src/brokers/redis"
-	sqsbroker "github.com/RichardKnop/machinery/src/brokers/sqs"
+	amqpbroker "github.com/pmaccamp/machinery/src/brokers/amqp"
+	eagerbroker "github.com/pmaccamp/machinery/src/brokers/eager"
+	gcppubsubbroker "github.com/pmaccamp/machinery/src/brokers/gcppubsub"
+	brokeriface "github.com/pmaccamp/machinery/src/brokers/iface"
+	redisbroker "github.com/pmaccamp/machinery/src/brokers/redis"
+	sqsbroker "github.com/pmaccamp/machinery/src/brokers/sqs"
 
-	amqpbackend "github.com/RichardKnop/machinery/src/backends/amqp"
-	dynamobackend "github.com/RichardKnop/machinery/src/backends/dynamodb"
-	eagerbackend "github.com/RichardKnop/machinery/src/backends/eager"
-	backendiface "github.com/RichardKnop/machinery/src/backends/iface"
-	memcachebackend "github.com/RichardKnop/machinery/src/backends/memcache"
-	mongobackend "github.com/RichardKnop/machinery/src/backends/mongo"
-	redisbackend "github.com/RichardKnop/machinery/src/backends/redis"
+	amqpbackend "github.com/pmaccamp/machinery/src/backends/amqp"
+	dynamobackend "github.com/pmaccamp/machinery/src/backends/dynamodb"
+	eagerbackend "github.com/pmaccamp/machinery/src/backends/eager"
+	backendiface "github.com/pmaccamp/machinery/src/backends/iface"
+	memcachebackend "github.com/pmaccamp/machinery/src/backends/memcache"
+	mongobackend "github.com/pmaccamp/machinery/src/backends/mongo"
+	redisbackend "github.com/pmaccamp/machinery/src/backends/redis"
 )
 
 // BrokerFactory creates a new object of iface.Broker

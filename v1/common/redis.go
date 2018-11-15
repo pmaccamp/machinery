@@ -3,8 +3,8 @@ package common
 import (
 	"time"
 
-	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/gomodule/redigo/redis"
+	"github.com/pmaccamp/machinery/v1/config"
 )
 
 var (

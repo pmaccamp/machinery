@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/RichardKnop/machinery/v1/backends/result"
-	"github.com/RichardKnop/machinery/v1/brokers/eager"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/tasks"
-	"github.com/RichardKnop/machinery/v1/tracing"
 	"github.com/google/uuid"
+	"github.com/pmaccamp/machinery/v1/backends/result"
+	"github.com/pmaccamp/machinery/v1/brokers/eager"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/tasks"
+	"github.com/pmaccamp/machinery/v1/tracing"
 
-	backendsiface "github.com/RichardKnop/machinery/src/backends/iface"
-	brokersiface "github.com/RichardKnop/machinery/src/brokers/iface"
 	opentracing "github.com/opentracing/opentracing-go"
+	backendsiface "github.com/pmaccamp/machinery/src/backends/iface"
+	brokersiface "github.com/pmaccamp/machinery/src/brokers/iface"
 )
 
 // Server is the main Machinery object and stores all configuration

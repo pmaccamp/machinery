@@ -3,9 +3,9 @@ package common_test
 import (
 	"testing"
 
-	"github.com/RichardKnop/machinery/v1/common"
-	"github.com/RichardKnop/machinery/v1/config"
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"github.com/pmaccamp/machinery/v1/common"
+	"github.com/pmaccamp/machinery/v1/config"
+	"github.com/pmaccamp/machinery/v1/tasks"
 	"github.com/stretchr/testify/assert"
 )
 

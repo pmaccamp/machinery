@@ -3,10 +3,10 @@ package dynamodb_test
 import (
 	"testing"
 
-	"github.com/RichardKnop/machinery/v1/backends/dynamodb"
-	"github.com/RichardKnop/machinery/v1/log"
-	"github.com/RichardKnop/machinery/v1/tasks"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/pmaccamp/machinery/v1/backends/dynamodb"
+	"github.com/pmaccamp/machinery/v1/log"
+	"github.com/pmaccamp/machinery/v1/tasks"
 	"github.com/stretchr/testify/assert"
 
 	awsdynamodb "github.com/aws/aws-sdk-go/service/dynamodb"
