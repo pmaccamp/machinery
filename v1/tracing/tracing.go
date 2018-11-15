@@ -93,7 +93,7 @@ func AnnotateSpanWithSignatureInfo(span opentracing.Span, signature *tasks.Signa
 
 	if signature.ChordCallback != nil {
 		span.SetTag("signature.chord.callback.uuid", signature.ChordCallback.UUID)
-		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Name)
+		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Id)
 	}
 }
 

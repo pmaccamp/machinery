@@ -55,7 +55,7 @@ func TestNewChain(t *testing.T) {
 
 	firstTask := chain.Tasks[0]
 
-	assert.Equal(t, "foo", firstTask.Name)
-	assert.Equal(t, "bar", firstTask.OnSuccess[0].Name)
-	assert.Equal(t, "qux", firstTask.OnSuccess[0].OnSuccess[0].Name)
+	assert.Equal(t, "foo", firstTask.Id)
+	assert.Equal(t, "bar", firstTask.OnSuccess[0].Id)
+	assert.Equal(t, "qux", firstTask.OnSuccess[0].OnSuccess[0].Id)
 }
