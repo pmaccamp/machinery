@@ -1,4 +1,4 @@
-module github.com/RichardKnop/machinery
+module github.com/pmaccamp/machinery
 
 require (
 	cloud.google.com/go v0.31.0
