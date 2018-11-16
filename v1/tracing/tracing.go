@@ -92,8 +92,8 @@ func AnnotateSpanWithSignatureInfo(span opentracing.Span, signature *tasks.Signa
 	}
 
 	if signature.ChordCallback != nil {
-		span.SetTag("signature.chord.callback.uuid", signature.ChordCallback.UUID)
-		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Name)
+		span.SetTag("signature.chord.callback.uuid", signature.ChordCallback.Id)
+		span.SetTag("signature.chord.callback.name", signature.ChordCallback.Task)
 	}
 }
 
@@ -131,7 +131,7 @@ func AnnotateSpanWithGroupInfo(span opentracing.Span, group *tasks.Group, sendCo
 // AnnotateSpanWithChordInfo ...
 func AnnotateSpanWithChordInfo(span opentracing.Span, chord *tasks.Chord, sendConcurrency int) {
 	// tag the span with chord specific info
-	span.SetTag("chord.callback.uuid", chord.Callback.UUID)
+	span.SetTag("chord.callback.uuid", chord.Callback.Id)
 
 	// inject the tracing span into the callback signature
 	chord.Callback.Headers = HeadersWithSpan(chord.Callback.Headers, span)

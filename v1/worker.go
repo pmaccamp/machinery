@@ -225,16 +225,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 		return fmt.Errorf("Set state to 'success' for task %s returned error: %s", signature.Id, err)
 	}
 
-	// Log human readable results of the processed task
-	var debugResults = "[]"
-	results, err := tasks.ReflectTaskResults(taskResults)
-	if err != nil {
-		log.WARNING.Print(err)
-	} else {
-		debugResults = tasks.HumanReadableResults(results)
-	}
-	log.DEBUG.Printf("Processed task %s. Results = %s", signature.Id, debugResults)
-
+	log.DEBUG.Printf("Processed task %s.", signature.Id)
 	// Trigger success callbacks
 
 	for _, successTask := range signature.OnSuccess {
