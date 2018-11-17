@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/pmaccamp/machinery/v1/backends/iface"
 	"github.com/pmaccamp/machinery/v1/common"
@@ -264,57 +266,7 @@ func (b *Backend) PurgeGroupMeta(groupUUID string) error {
 
 // updateState saves current task state
 func (b *Backend) updateState(taskState *tasks.TaskState) error {
-	message, err := json.Marshal(taskState)
-	if err != nil {
-		return fmt.Errorf("JSON marshal error: %s", err)
-	}
-
-	declareQueueArgs := amqp.Table{
-		// Time in milliseconds
-		// after that message will expire
-		"x-message-ttl": int32(b.getExpiresIn()),
-		// Time after that the queue will be deleted.
-		"x-expires": int32(b.getExpiresIn()),
-	}
-	conn, channel, queue, confirmsChan, _, err := b.Connect(
-		b.GetConfig().Broker,
-		b.GetConfig().TLSConfig,
-		b.GetConfig().AMQP.Exchange,     // exchange name
-		b.GetConfig().AMQP.ExchangeType, // exchange type
-		taskState.TaskUUID,              // queue name
-		false,                           // queue durable
-		true,                            // queue delete when unused
-		taskState.TaskUUID,              // queue binding key
-		nil,                             // exchange declare args
-		declareQueueArgs,                // queue declare args
-		nil,                             // queue binding args
-	)
-	if err != nil {
-		return err
-	}
-	defer b.Close(channel, conn)
-
-	if err := channel.Publish(
-		b.GetConfig().AMQP.Exchange, // exchange
-		queue.Name,                  // routing key
-		false,                       // mandatory
-		false,                       // immediate
-		amqp.Publishing{
-			ContentType:  "application/json",
-			Body:         message,
-			DeliveryMode: amqp.Persistent, // Persistent // Transient
-		},
-	); err != nil {
-		return err
-	}
-
-	confirmed := <-confirmsChan
-
-	if confirmed.Ack {
-		return nil
-	}
-
-	return fmt.Errorf("Failed delivery of delivery tag: %d", confirmed.DeliveryTag)
+	return nil // Disable task state updates for the time being
 }
 
 // getExpiresIn returns expiration time
@@ -327,6 +279,15 @@ func (b *Backend) getExpiresIn() int {
 	return resultsExpireIn
 }
 
+// Celery requires specific format
+type ResultMessage struct {
+	ID        string        `json:"task_id"`
+	Status    string        `json:"status"`
+	Traceback interface{}   `json:"traceback"`
+	Result    interface{}   `json:"result"`
+	Children  []interface{} `json:"children"`
+}
+
 // markTaskCompleted marks task as completed in either groupdUUID_success
 // or groupUUID_failure queue. This is important for GroupCompleted and
 // GroupSuccessful methods
@@ -335,55 +296,68 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 		return nil
 	}
 
-	message, err := json.Marshal(taskState)
-	if err != nil {
-		return fmt.Errorf("JSON marshal error: %s", err)
+	queueName := strings.Replace(taskState.TaskUUID, "-", "", -1)
+
+	resultMessage := &ResultMessage{
+		ID:        taskState.TaskUUID,
+		Status:    taskState.State,
+		Traceback: nil,
+		Result:    taskState.Results[0].Value,
+		Children:  nil,
 	}
 
-	declareQueueArgs := amqp.Table{
-		// Time in milliseconds
-		// after that message will expire
-		"x-message-ttl": int32(b.getExpiresIn()),
-		// Time after that the queue will be deleted.
-		"x-expires": int32(b.getExpiresIn()),
-	}
-	conn, channel, queue, confirmsChan, _, err := b.Connect(
-		b.GetConfig().Broker,
-		b.GetConfig().TLSConfig,
-		b.GetConfig().AMQP.Exchange,     // exchange name
-		b.GetConfig().AMQP.ExchangeType, // exchange type
-		taskState.TaskUUID,              // queue name
-		false,                           // queue durable
-		true,                            // queue delete when unused
-		taskState.TaskUUID,              // queue binding key
-		nil,                             // exchange declare args
-		declareQueueArgs,                // queue declare args
-		nil,                             // queue binding args
-	)
+	log.INFO.Print(taskState)
+
+	conn, channel, err := b.Open(b.GetConfig().Broker, b.GetConfig().TLSConfig)
 	if err != nil {
 		return err
 	}
 	defer b.Close(channel, conn)
 
-	if err := channel.Publish(
-		b.GetConfig().AMQP.Exchange, // exchange
-		queue.Name,                  // routing key
-		false,                       // mandatory
-		false,                       // immediate
-		amqp.Publishing{
-			ContentType:  "application/json",
-			Body:         message,
-			DeliveryMode: amqp.Persistent, // Persistent // Transient
-		},
-	); err != nil {
+	args := amqp.Table{"x-expires": int32(86400000)}
+	_, err = channel.QueueDeclare(
+		queueName, // name
+		true,      // durable
+		true,      // autoDelete
+		false,     // exclusive
+		false,     // noWait
+		args,      // args
+	)
+	if err != nil {
 		return err
 	}
 
-	confirmed := <-confirmsChan
-
-	if !confirmed.Ack {
-		return fmt.Errorf("Failed delivery of delivery tag: %v", confirmed.DeliveryTag)
+	err = channel.ExchangeDeclare(
+		"default",
+		"direct",
+		true,
+		true,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return err
 	}
+
+	resBytes, err := json.Marshal(resultMessage)
+	if err != nil {
+		return err
+	}
+
+	message := amqp.Publishing{
+		DeliveryMode: amqp.Persistent,
+		Timestamp:    time.Now(),
+		ContentType:  "application/json",
+		Body:         resBytes,
+	}
+	channel.Publish(
+		"",
+		queueName,
+		false,
+		false,
+		message,
+	)
 
 	return nil
 }
