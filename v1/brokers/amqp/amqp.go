@@ -312,7 +312,7 @@ func (b *Broker) consumeOne(delivery amqp.Delivery, taskProcessor iface.TaskProc
 		return nil
 	}
 
-	log.INFO.Printf("Received new message: %s", delivery.Body)
+	log.INFO.Printf("Received new message on worker %s: %s", delivery.ConsumerTag, delivery.Body)
 
 	err := taskProcessor.Process(signature)
 	delivery.Ack(multiple)

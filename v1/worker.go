@@ -225,7 +225,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 		return fmt.Errorf("Set state to 'success' for task %s returned error: %s", signature.Id, err)
 	}
 
-	log.DEBUG.Printf("Processed task %s.", signature.Id)
+	log.DEBUG.Printf("Processed task %s on worker %s.", signature.Id, worker.ConsumerTag)
 	// Trigger success callbacks
 
 	for _, successTask := range signature.OnSuccess {
