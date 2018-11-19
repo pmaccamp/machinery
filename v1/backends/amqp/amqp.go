@@ -300,7 +300,7 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 
 	result := ""
 
-	if taskState.Results != nil && len(taskState.Results) > 0 && taskState.Results[0].Value != nil {
+	if taskState.Results != nil && len(taskState.Results) > 0 {
 		result = taskState.Results[0].Value
 	}
 
