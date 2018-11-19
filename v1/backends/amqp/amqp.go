@@ -298,18 +298,22 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 
 	queueName := strings.Replace(taskState.TaskUUID, "-", "", -1)
 
-	result := ""
-
-	if taskState.Results != nil && len(taskState.Results) > 0 {
-		result = taskState.Results[0].Value
-	}
-
 	resultMessage := &ResultMessage{
 		ID:        taskState.TaskUUID,
 		Status:    taskState.State,
 		Traceback: nil,
-		Result:    result,
+		Result:    "",
 		Children:  nil,
+	}
+
+	if taskState.Results != nil && len(taskState.Results) > 0 && taskState.Results[0].Value != nil {
+		resultMessage = &ResultMessage{
+			ID:        taskState.TaskUUID,
+			Status:    taskState.State,
+			Traceback: nil,
+			Result:    taskState.Results[0].Value,
+			Children:  nil,
+		}
 	}
 
 	log.INFO.Print(taskState)
