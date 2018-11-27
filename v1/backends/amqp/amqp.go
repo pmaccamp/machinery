@@ -316,39 +316,11 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 		}
 	}
 
-	log.INFO.Print(taskState)
-
 	conn, channel, err := b.Open(b.GetConfig().Broker, b.GetConfig().TLSConfig)
 	if err != nil {
 		return err
 	}
 	defer b.Close(channel, conn)
-
-	args := amqp.Table{"x-expires": int32(86400000)}
-	_, err = channel.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		true,      // autoDelete
-		false,     // exclusive
-		false,     // noWait
-		args,      // args
-	)
-	if err != nil {
-		return err
-	}
-
-	err = channel.ExchangeDeclare(
-		"default",
-		"direct",
-		true,
-		true,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		return err
-	}
 
 	resBytes, err := json.Marshal(resultMessage)
 	if err != nil {
