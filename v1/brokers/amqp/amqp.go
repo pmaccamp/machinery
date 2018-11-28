@@ -295,7 +295,6 @@ func (b *Broker) consumeOne(delivery amqp.Delivery, taskProcessor iface.TaskProc
 	// Unmarshal message body into signature struct
 	signature := new(tasks.Signature)
 	decoder := json.NewDecoder(bytes.NewReader(delivery.Body))
-	decoder.UseNumber()
 	if err := decoder.Decode(signature); err != nil {
 		delivery.Nack(multiple, requeue)
 		return errs.NewErrCouldNotUnmarshaTaskSignature(delivery.Body, err)

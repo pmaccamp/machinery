@@ -17,7 +17,7 @@ func TestTaskCallErrorTest(t *testing.T) {
 	// Create test task that returns tasks.ErrRetryTaskLater error
 	retriable := func() error { return tasks.NewErrRetryTaskLater("some error", 4*time.Hour) }
 
-	task, err := tasks.New(retriable, []tasks.Arg{})
+	task, err := tasks.New(retriable, []interface{}{})
 	assert.NoError(t, err)
 
 	// Invoke TryCall and validate that returned error can be cast to tasks.ErrRetryTaskLater
@@ -30,7 +30,7 @@ func TestTaskCallErrorTest(t *testing.T) {
 	// Create test task that returns a standard error
 	standard := func() error { return errors.New("some error") }
 
-	task, err = tasks.New(standard, []tasks.Arg{})
+	task, err = tasks.New(standard, []interface{}{})
 	assert.NoError(t, err)
 
 	// Invoke TryCall and validate that returned error is standard
@@ -44,7 +44,7 @@ func TestTaskReflectArgs(t *testing.T) {
 	t.Parallel()
 
 	task := new(tasks.Task)
-	args := []tasks.Arg{
+	args := []interface{}{
 		{
 			Type:  "[]int64",
 			Value: []int64{1, 2},
@@ -64,7 +64,7 @@ func TestTaskCallInvalidArgRobustnessError(t *testing.T) {
 	f := func(x int) error { return nil }
 
 	// Construct an invalid argument list and reflect it
-	args := []tasks.Arg{
+	args := []interface{}{
 		{Type: "bool", Value: true},
 	}
 
@@ -83,7 +83,7 @@ func TestTaskCallInterfaceValuedResult(t *testing.T) {
 	// Create a test task function
 	f := func() (interface{}, error) { return math.Pi, nil }
 
-	task, err := tasks.New(f, []tasks.Arg{})
+	task, err := tasks.New(f, []interface{}{})
 	assert.NoError(t, err)
 
 	taskResults, err := task.Call()
@@ -99,7 +99,7 @@ func TestTaskCallWithContext(t *testing.T) {
 		assert.NotNil(t, c)
 		return math.Pi, nil
 	}
-	task, err := tasks.New(f, []tasks.Arg{})
+	task, err := tasks.New(f, []interface{}{})
 	assert.NoError(t, err)
 	taskResults, err := task.Call()
 	assert.NoError(t, err)

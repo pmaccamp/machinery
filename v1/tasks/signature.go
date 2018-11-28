@@ -7,13 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Arg represents a single argument passed to invocation fo a task
-type Arg struct {
-	Name  string      `bson:"name"`
-	Type  string      `bson:"type"`
-	Value interface{} `bson:"value"`
-}
-
 // Headers represents the headers which should be used to direct the task
 type Headers map[string]interface{}
 
@@ -49,7 +42,7 @@ type Signature struct {
 	ETA            *time.Time
 	GroupUUID      string
 	GroupTaskCount int
-	Args           []Arg
+	Args           []interface{}
 	Headers        Headers
 	Immutable      bool
 	RetryCount     int
@@ -60,7 +53,7 @@ type Signature struct {
 }
 
 // NewSignature creates a new task signature
-func NewSignature(name string, args []Arg) (*Signature, error) {
+func NewSignature(name string, args []interface{}) (*Signature, error) {
 	signatureID := uuid.New().String()
 	return &Signature{
 		Id:   fmt.Sprintf("task_%v", signatureID),

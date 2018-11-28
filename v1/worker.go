@@ -232,10 +232,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 		if signature.Immutable == false {
 			// Pass results of the task to success callbacks
 			for _, taskResult := range taskResults {
-				successTask.Args = append(successTask.Args, tasks.Arg{
-					Type:  taskResult.Type,
-					Value: taskResult.Value,
-				})
+				successTask.Args = append(successTask.Args, taskResult.Value)
 			}
 		}
 
@@ -300,10 +297,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 		if signature.ChordCallback.Immutable == false {
 			// Pass results of the task to the chord callback
 			for _, taskResult := range taskState.Results {
-				signature.ChordCallback.Args = append(signature.ChordCallback.Args, tasks.Arg{
-					Type:  taskResult.Type,
-					Value: taskResult.Value,
-				})
+				signature.ChordCallback.Args = append(signature.ChordCallback.Args, taskResult.Value)
 			}
 		}
 	}
@@ -333,10 +327,7 @@ func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error) erro
 	// Trigger error callbacks
 	for _, errorTask := range signature.OnError {
 		// Pass error as a first argument to error callbacks
-		args := append([]tasks.Arg{{
-			Type:  "string",
-			Value: taskErr.Error(),
-		}}, errorTask.Args...)
+		args := append([]interface{}{taskErr.Error()}, errorTask.Args...)
 		errorTask.Args = args
 		worker.server.SendTask(errorTask)
 	}

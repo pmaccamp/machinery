@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"runtime/debug"
 
-	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go"
 	opentracing_ext "github.com/opentracing/opentracing-go/ext"
 	opentracing_log "github.com/opentracing/opentracing-go/log"
 
@@ -28,9 +28,10 @@ type Task struct {
 
 // New tries to use reflection to convert the function and arguments
 // into a reflect.Value and prepare it for invocation
-func New(taskFunc interface{}, args []Arg) (*Task, error) {
+func New(taskFunc interface{}, args []interface{}) (*Task, error) {
+	var taskFuncValue = reflect.ValueOf(taskFunc)
 	task := &Task{
-		TaskFunc: reflect.ValueOf(taskFunc),
+		TaskFunc: taskFuncValue,
 		Context:  context.Background(),
 	}
 
@@ -42,7 +43,7 @@ func New(taskFunc interface{}, args []Arg) (*Task, error) {
 		}
 	}
 
-	if err := task.ReflectArgs(args); err != nil {
+	if err := task.ReflectArgs(args, &taskFuncValue); err != nil {
 		return nil, fmt.Errorf("Reflect task args error: %s", err)
 	}
 
@@ -141,15 +142,24 @@ func (t *Task) Call() (taskResults []*TaskResult, err error) {
 }
 
 // ReflectArgs converts []TaskArg to []reflect.Value
-func (t *Task) ReflectArgs(args []Arg) error {
+func (t *Task) ReflectArgs(args []interface{}, taskFunc *reflect.Value) error {
 	argValues := make([]reflect.Value, len(args))
 
+	numArgs := taskFunc.Type().NumIn()
+	if numArgs != len(args) {
+		return fmt.Errorf("Number of task arguments %d does not match number of message arguments %d", numArgs, len(args))
+	}
+	// construct arguments
 	for i, arg := range args {
-		argValue, err := ReflectValue(arg.Type, arg.Value)
-		if err != nil {
-			return err
+		origType := taskFunc.Type().In(i).Kind()
+		msgType := reflect.TypeOf(arg).Kind()
+		// special case - convert float64 to int if applicable
+		// this is due to json limitation where all numbers are converted to float64
+		if origType == reflect.Int && msgType == reflect.Float64 {
+			argValues[i] = reflect.ValueOf(int(arg.(float64)))
+		} else {
+			argValues[i] = reflect.ValueOf(arg)
 		}
-		argValues[i] = argValue
 	}
 
 	t.Args = argValues
