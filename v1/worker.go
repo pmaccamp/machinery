@@ -22,7 +22,7 @@ type Worker struct {
 	ConsumerTag  string
 	Concurrency  int
 	Queue        string
-	errorHandler func(err error)
+	errorHandler func(err error, signature *tasks.Signature)
 }
 
 // Launch starts a new worker process. The worker subscribes
@@ -64,7 +64,7 @@ func (worker *Worker) LaunchAsync(errorsChan chan<- error) {
 
 			if retry {
 				if worker.errorHandler != nil {
-					worker.errorHandler(err)
+					worker.errorHandler(err, nil)
 				} else {
 					log.WARNING.Printf("Broker failed with error: %s", err)
 				}
@@ -319,7 +319,7 @@ func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error) erro
 	}
 
 	if worker.errorHandler != nil {
-		worker.errorHandler(taskErr)
+		worker.errorHandler(taskErr, signature)
 	} else {
 		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.Id, taskErr)
 	}
@@ -343,7 +343,7 @@ func (worker *Worker) hasAMQPBackend() bool {
 
 // SetErrorHandler sets a custom error handler for task errors
 // A default behavior is just to log the error after all the retry attempts fail
-func (worker *Worker) SetErrorHandler(handler func(err error)) {
+func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature)) {
 	worker.errorHandler = handler
 }
 

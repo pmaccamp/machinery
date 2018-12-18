@@ -3,12 +3,9 @@ module github.com/pmaccamp/machinery
 require (
 	cloud.google.com/go v0.31.0
 	github.com/RichardKnop/logging v0.0.0-20180729160517-75cec7213f7c
-	github.com/RichardKnop/redsync v1.2.0
 	github.com/aws/aws-sdk-go v1.15.66
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/garyburd/redigo v2.0.0+incompatible // indirect
-	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.0.0
 	github.com/googleapis/gax-go v2.0.0+incompatible // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
@@ -18,8 +15,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/streadway/amqp v0.0.0-20180806233856-70e15c650864
 	github.com/stretchr/testify v1.2.2
-	github.com/stvp/tempredis v0.0.0-20160122230306-83f7aae7ea49 // indirect
-	github.com/urfave/cli v1.20.0
 	go.opencensus.io v0.18.0 // indirect
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816 // indirect
 	golang.org/x/oauth2 v0.0.0-20181031022657-8527f56f7107 // indirect

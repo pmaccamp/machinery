@@ -32,14 +32,6 @@ var (
 			TaskStatesTable: "task_states",
 			GroupMetasTable: "group_metas",
 		},
-		Redis: &RedisConfig{
-			MaxIdle:                3,
-			IdleTimeout:            240,
-			ReadTimeout:            15,
-			WriteTimeout:           15,
-			ConnectTimeout:         15,
-			DelayedTasksPollPeriod: 20,
-		},
 		GCPPubSub: &GCPPubSubConfig{
 			Client: nil,
 		},
@@ -56,7 +48,6 @@ type Config struct {
 	ResultsExpireIn int              `yaml:"results_expire_in" envconfig:"RESULTS_EXPIRE_IN"`
 	AMQP            *AMQPConfig      `yaml:"amqp"`
 	SQS             *SQSConfig       `yaml:"sqs"`
-	Redis           *RedisConfig     `yaml:"redis"`
 	GCPPubSub       *GCPPubSubConfig `yaml:"-" ignored:"true"`
 	TLSConfig       *tls.Config
 	// NoUnixSignals - when set disables signal handling in machinery
@@ -89,38 +80,6 @@ type SQSConfig struct {
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 	// visibility timeout should default to nil to use the overall visibility timeout for the queue
 	VisibilityTimeout *int `yaml:"receive_visibility_timeout" envconfig:"SQS_VISIBILITY_TIMEOUT"`
-}
-
-// RedisConfig ...
-type RedisConfig struct {
-	// Maximum number of idle connections in the pool.
-	MaxIdle int `yaml:"max_idle" envconfig:"REDIS_MAX_IDLE"`
-
-	// Maximum number of connections allocated by the pool at a given time.
-	// When zero, there is no limit on the number of connections in the pool.
-	MaxActive int `yaml:"max_active" envconfig:"REDIS_MAX_ACTIVE"`
-
-	// Close connections after remaining idle for this duration in seconds. If the value
-	// is zero, then idle connections are not closed. Applications should set
-	// the timeout to a value less than the server's timeout.
-	IdleTimeout int `yaml:"max_idle_timeout" envconfig:"REDIS_IDLE_TIMEOUT"`
-
-	// If Wait is true and the pool is at the MaxActive limit, then Get() waits
-	// for a connection to be returned to the pool before returning.
-	Wait bool `yaml:"wait" envconfig:"REDIS_WAIT"`
-
-	// ReadTimeout specifies the timeout in seconds for reading a single command reply.
-	ReadTimeout int `yaml:"read_timeout" envconfig:"REDIS_READ_TIMEOUT"`
-
-	// WriteTimeout specifies the timeout in seconds for writing a single command.
-	WriteTimeout int `yaml:"write_timeout" envconfig:"REDIS_WRITE_TIMEOUT"`
-
-	// ConnectTimeout specifies the timeout in seconds for connecting to the Redis server when
-	// no DialNetDial option is specified.
-	ConnectTimeout int `yaml:"connect_timeout" envconfig:"REDIS_CONNECT_TIMEOUT"`
-
-	// DelayedTasksPollPeriod specifies the period in milliseconds when polling redis for delayed tasks
-	DelayedTasksPollPeriod int `yaml:"delayed_tasks_poll_period" envconfig:"REDIS_DELAYED_TASKS_POLL_PERIOD"`
 }
 
 // GCPPubSubConfig wraps GCP PubSub related configuration
