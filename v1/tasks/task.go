@@ -56,7 +56,7 @@ func New(taskFunc interface{}, args []interface{}) (*Task, error) {
 // 1. The reflected function invocation panics (e.g. due to a mismatched
 //    argument list).
 // 2. The task func itself returns a non-nil error.
-func (t *Task) Call() (taskResults []*TaskResult, err error) {
+func (t *Task) Call() (taskResults []*TaskResult, err error, trace string) {
 	// retrieve the span from the task's context and finish it as soon as this function returns
 	if span := opentracing.SpanFromContext(t.Context); span != nil {
 		defer span.Finish()
@@ -83,6 +83,8 @@ func (t *Task) Call() (taskResults []*TaskResult, err error) {
 				)
 			}
 
+			trace = string(debug.Stack())
+
 			// Print stack trace
 			log.ERROR.Printf("%s", debug.Stack())
 		}
@@ -100,7 +102,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error) {
 
 	// Task must return at least a value
 	if len(results) == 0 {
-		return nil, ErrTaskReturnsNoValue
+		return nil, ErrTaskReturnsNoValue, trace
 	}
 
 	// Last returned value
@@ -113,18 +115,18 @@ func (t *Task) Call() (taskResults []*TaskResult, err error) {
 		// If the result implements Retriable interface, return instance of Retriable
 		retriableErrorInterface := reflect.TypeOf((*Retriable)(nil)).Elem()
 		if lastResult.Type().Implements(retriableErrorInterface) {
-			return nil, lastResult.Interface().(ErrRetryTaskLater)
+			return nil, lastResult.Interface().(ErrRetryTaskLater), trace
 		}
 
 		// Otherwise, check that the result implements the standard error interface,
 		// if not, return ErrLastReturnValueMustBeError error
 		errorInterface := reflect.TypeOf((*error)(nil)).Elem()
 		if !lastResult.Type().Implements(errorInterface) {
-			return nil, ErrLastReturnValueMustBeError
+			return nil, ErrLastReturnValueMustBeError, trace
 		}
 
 		// Return the standard error
-		return nil, lastResult.Interface().(error)
+		return nil, lastResult.Interface().(error), trace
 	}
 
 	// Convert reflect values to task results
@@ -138,7 +140,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error) {
 		}
 	}
 
-	return taskResults, err
+	return taskResults, err, trace
 }
 
 // ReflectArgs converts []TaskArg to []reflect.Value
