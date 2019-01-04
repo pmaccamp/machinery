@@ -59,9 +59,9 @@ func (b *Broker) StartConsuming(consumerTag string, concurrency int, taskProcess
 		queueName,                       // queue name
 		true,                            // queue durable
 		false,                           // queue delete when unused
-		b.GetConfig().AMQP.BindingKey, // queue binding key
-		nil, // exchange declare args
-		nil, // queue declare args
+		b.GetConfig().AMQP.BindingKey,   // queue binding key
+		nil,                             // exchange declare args
+		nil,                             // queue declare args
 		amqp.Table(b.GetConfig().AMQP.QueueBindingArgs), // queue binding args
 	)
 	if err != nil {
@@ -200,8 +200,8 @@ func (b *Broker) Publish(signature *tasks.Signature) error {
 
 	connection, err := b.GetOrOpenConnection(signature.RoutingKey,
 		b.GetConfig().AMQP.BindingKey, // queue binding key
-		nil, // exchange declare args
-		nil, // queue declare args
+		nil,                           // exchange declare args
+		nil,                           // queue declare args
 		amqp.Table(b.GetConfig().AMQP.QueueBindingArgs), // queue binding args
 	)
 	if err != nil {
@@ -300,6 +300,12 @@ func (b *Broker) consumeOne(delivery amqp.Delivery, taskProcessor iface.TaskProc
 		return errs.NewErrCouldNotUnmarshaTaskSignature(delivery.Body, err)
 	}
 
+	if signature.Expires != nil && signature.Expires.UnixNano() < time.Now().UnixNano() {
+		log.INFO.Printf("Task expired at %s, removing from queue", signature.Expires.String())
+		delivery.Nack(multiple, requeue)
+		return nil
+	}
+
 	// If the task is not registered, we nack it and requeue,
 	// there might be different workers for processing specific tasks
 	if !b.IsTaskRegistered(signature.Task) {
@@ -351,9 +357,9 @@ func (b *Broker) delay(signature *tasks.Signature, delayMs int64) error {
 		"x-expires": delayMs * 2,
 	}
 	connection, err := b.GetOrOpenConnection(queueName,
-		queueName,                                       // queue binding key
-		nil,                                             // exchange declare args
-		declareQueueArgs,                                // queue declare arghs
+		queueName,        // queue binding key
+		nil,              // exchange declare args
+		declareQueueArgs, // queue declare arghs
 		amqp.Table(b.GetConfig().AMQP.QueueBindingArgs), // queue binding args
 	)
 	if err != nil {

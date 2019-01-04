@@ -40,6 +40,7 @@ type Signature struct {
 	Id             string
 	RoutingKey     string
 	ETA            *time.Time
+	Expires        *time.Time
 	GroupUUID      string
 	GroupTaskCount int
 	Args           []interface{}
