@@ -56,7 +56,7 @@ func New(taskFunc interface{}, args []interface{}) (*Task, error) {
 // 1. The reflected function invocation panics (e.g. due to a mismatched
 //    argument list).
 // 2. The task func itself returns a non-nil error.
-func (t *Task) Call() (taskResults []*TaskResult, err error, trace string) {
+func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
 	// retrieve the span from the task's context and finish it as soon as this function returns
 	if span := opentracing.SpanFromContext(t.Context); span != nil {
 		defer span.Finish()
@@ -83,7 +83,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, trace string) {
 				)
 			}
 
-			trace = string(debug.Stack())
+			trace = debug.Stack()
 
 			// Print stack trace
 			log.ERROR.Printf("%s", debug.Stack())

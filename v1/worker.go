@@ -23,7 +23,7 @@ type Worker struct {
 	ConsumerTag  string
 	Concurrency  int
 	Queue        string
-	errorHandler func(err error, signature *tasks.Signature, trace string)
+	errorHandler func(err error, signature *tasks.Signature, trace []byte)
 }
 
 // Launch starts a new worker process. The worker subscribes
@@ -65,7 +65,7 @@ func (worker *Worker) LaunchAsync(errorsChan chan<- error) {
 
 			if retryTask {
 				if worker.errorHandler != nil {
-					worker.errorHandler(err, nil, string(debug.Stack()))
+					worker.errorHandler(err, nil, debug.Stack())
 				} else {
 					log.WARNING.Printf("Broker failed with error: %s", err)
 				}
@@ -138,7 +138,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	// if this failed, it means the task is malformed, probably has invalid
 	// signature, go directly to task failed without checking whether to retry
 	if err != nil {
-		worker.taskFailed(signature, err, string(debug.Stack()))
+		worker.taskFailed(signature, err, debug.Stack())
 		return err
 	}
 
@@ -313,7 +313,7 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 }
 
 // taskFailed updates the task state and triggers error callbacks
-func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error, trace string) error {
+func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error, trace []byte) error {
 	// Update task state to FAILURE
 	if err := worker.server.GetBackend().SetStateFailure(signature, taskErr.Error()); err != nil {
 		return fmt.Errorf("Set state to 'failure' for task %s returned error: %s", signature.Id, err)
