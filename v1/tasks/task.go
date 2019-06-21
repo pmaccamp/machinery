@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"runtime"
 	"runtime/debug"
 
 	"github.com/opentracing/opentracing-go"
@@ -13,6 +12,7 @@ import (
 	opentracing_log "github.com/opentracing/opentracing-go/log"
 
 	"github.com/pmaccamp/machinery/v1/log"
+	"github.com/pmaccamp/machinery/v1/stackframe"
 )
 
 // ErrTaskPanicked ...
@@ -57,7 +57,7 @@ func New(taskFunc interface{}, args []interface{}) (*Task, error) {
 // 1. The reflected function invocation panics (e.g. due to a mismatched
 //    argument list).
 // 2. The task func itself returns a non-nil error.
-func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []uintptr) {
+func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []stackframe.StackFrame) {
 	// retrieve the span from the task's context and finish it as soon as this function returns
 	if span := opentracing.SpanFromContext(t.Context); span != nil {
 		defer span.Finish()
@@ -84,9 +84,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []uintp
 				)
 			}
 
-			stackFrames := make([]uintptr, 50) // capture 50 frames max
-			length := runtime.Callers(0, stackFrames[:])
-			stackFrames = stackFrames[:length]
+			stackFrames = stackframe.CurrentStackFrames()
 
 			// Print stack trace
 			log.ERROR.Printf("%s", debug.Stack())
