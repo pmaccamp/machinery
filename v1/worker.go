@@ -344,7 +344,7 @@ func (worker *Worker) hasAMQPBackend() bool {
 
 // SetErrorHandler sets a custom error handler for task errors
 // A default behavior is just to log the error after all the retry attempts fail
-func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature, trace string)) {
+func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature, trace []byte)) {
 	worker.errorHandler = handler
 }
 
