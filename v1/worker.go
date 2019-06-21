@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"runtime/debug"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -23,7 +23,7 @@ type Worker struct {
 	ConsumerTag  string
 	Concurrency  int
 	Queue        string
-	errorHandler func(err error, signature *tasks.Signature, trace []byte)
+	errorHandler func(err error, signature *tasks.Signature, stackFrames []uintptr)
 }
 
 // Launch starts a new worker process. The worker subscribes
@@ -34,6 +34,13 @@ func (worker *Worker) Launch() error {
 	worker.LaunchAsync(errorsChan)
 
 	return <-errorsChan
+}
+
+// skip is number of frames to skip
+func getStackFrames(skip int) []uintptr {
+	stack := make([]uintptr, 50) // capture 50 frames max
+	length := runtime.Callers(1+skip, stack[:])
+	return stack[:length]
 }
 
 // LaunchAsync is a non blocking version of Launch
@@ -65,7 +72,7 @@ func (worker *Worker) LaunchAsync(errorsChan chan<- error) {
 
 			if retryTask {
 				if worker.errorHandler != nil {
-					worker.errorHandler(err, nil, debug.Stack())
+					worker.errorHandler(err, nil, getStackFrames(0))
 				} else {
 					log.WARNING.Printf("Broker failed with error: %s", err)
 				}
@@ -138,7 +145,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	// if this failed, it means the task is malformed, probably has invalid
 	// signature, go directly to task failed without checking whether to retry
 	if err != nil {
-		worker.taskFailed(signature, err, debug.Stack())
+		_ = worker.taskFailed(signature, err, getStackFrames(0))
 		return err
 	}
 
@@ -155,7 +162,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	}
 
 	// Call the task
-	results, err, trace := task.Call()
+	results, err, stackFrames := task.Call()
 	if err != nil {
 		// If a tasks.ErrRetryTaskLater was returned from the task,
 		// retry the task after specified duration
@@ -170,7 +177,7 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 			return worker.taskRetry(signature)
 		}
 
-		return worker.taskFailed(signature, err, trace)
+		return worker.taskFailed(signature, err, stackFrames)
 	}
 
 	return worker.taskSucceeded(signature, results)
@@ -313,14 +320,14 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 }
 
 // taskFailed updates the task state and triggers error callbacks
-func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error, trace []byte) error {
+func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error, stackFrames []uintptr) error {
 	// Update task state to FAILURE
 	if err := worker.server.GetBackend().SetStateFailure(signature, taskErr.Error()); err != nil {
 		return fmt.Errorf("Set state to 'failure' for task %s returned error: %s", signature.Id, err)
 	}
 
 	if worker.errorHandler != nil {
-		worker.errorHandler(taskErr, signature, trace)
+		worker.errorHandler(taskErr, signature, stackFrames)
 	} else {
 		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.Id, taskErr)
 	}
@@ -344,7 +351,7 @@ func (worker *Worker) hasAMQPBackend() bool {
 
 // SetErrorHandler sets a custom error handler for task errors
 // A default behavior is just to log the error after all the retry attempts fail
-func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature, trace []byte)) {
+func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature, stackFrames []uintptr)) {
 	worker.errorHandler = handler
 }
 

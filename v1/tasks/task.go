@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"runtime"
 	"runtime/debug"
 
 	"github.com/opentracing/opentracing-go"
@@ -56,7 +57,7 @@ func New(taskFunc interface{}, args []interface{}) (*Task, error) {
 // 1. The reflected function invocation panics (e.g. due to a mismatched
 //    argument list).
 // 2. The task func itself returns a non-nil error.
-func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
+func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []uintptr) {
 	// retrieve the span from the task's context and finish it as soon as this function returns
 	if span := opentracing.SpanFromContext(t.Context); span != nil {
 		defer span.Finish()
@@ -83,7 +84,9 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
 				)
 			}
 
-			trace = debug.Stack()
+			stackFrames := make([]uintptr, 50) // capture 50 frames max
+			length := runtime.Callers(0, stackFrames[:])
+			stackFrames = stackFrames[:length]
 
 			// Print stack trace
 			log.ERROR.Printf("%s", debug.Stack())
@@ -102,7 +105,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
 
 	// Task must return at least a value
 	if len(results) == 0 {
-		return nil, ErrTaskReturnsNoValue, trace
+		return nil, ErrTaskReturnsNoValue, stackFrames
 	}
 
 	// Last returned value
@@ -115,18 +118,18 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
 		// If the result implements Retriable interface, return instance of Retriable
 		retriableErrorInterface := reflect.TypeOf((*Retriable)(nil)).Elem()
 		if lastResult.Type().Implements(retriableErrorInterface) {
-			return nil, lastResult.Interface().(ErrRetryTaskLater), trace
+			return nil, lastResult.Interface().(ErrRetryTaskLater), stackFrames
 		}
 
 		// Otherwise, check that the result implements the standard error interface,
 		// if not, return ErrLastReturnValueMustBeError error
 		errorInterface := reflect.TypeOf((*error)(nil)).Elem()
 		if !lastResult.Type().Implements(errorInterface) {
-			return nil, ErrLastReturnValueMustBeError, trace
+			return nil, ErrLastReturnValueMustBeError, stackFrames
 		}
 
 		// Return the standard error
-		return nil, lastResult.Interface().(error), trace
+		return nil, lastResult.Interface().(error), stackFrames
 	}
 
 	// Convert reflect values to task results
@@ -140,7 +143,7 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, trace []byte) {
 		}
 	}
 
-	return taskResults, err, trace
+	return taskResults, err, stackFrames
 }
 
 // ReflectArgs converts []TaskArg to []reflect.Value
