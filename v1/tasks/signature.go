@@ -44,6 +44,7 @@ type Signature struct {
 	GroupUUID      string
 	GroupTaskCount int
 	Args           []interface{}
+	Kwargs         map[string]interface{}
 	Headers        Headers
 	Immutable      bool
 	RetryCount     int

@@ -27,16 +27,18 @@ type Task struct {
 	Context       context.Context
 	Args          []reflect.Value
 	BugsnagConfig *bugsnag.Configuration
+	Signature     *Signature
 }
 
 // New tries to use reflection to convert the function and arguments
 // into a reflect.Value and prepare it for invocation
-func New(bugsnagConfig *bugsnag.Configuration, taskFunc interface{}, args []interface{}) (*Task, error) {
+func New(bugsnagConfig *bugsnag.Configuration, signature *Signature, taskFunc interface{}, args []interface{}) (*Task, error) {
 	var taskFuncValue = reflect.ValueOf(taskFunc)
 	task := &Task{
 		TaskFunc:      taskFuncValue,
 		Context:       context.Background(),
 		BugsnagConfig: bugsnagConfig,
+		Signature:     signature,
 	}
 
 	taskFuncType := reflect.TypeOf(taskFunc)
@@ -89,11 +91,29 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []stack
 
 			if t.BugsnagConfig != nil {
 				bugsnag.Configure(*t.BugsnagConfig)
-				_ = bugsnag.Notify(err, bugsnag.MetaData{
-					"data": {
-						"args":    t.Args,
-						"context": t.Context,
-					}})
+
+				if val, ok := t.Signature.Kwargs["user_id"]; ok {
+
+					_ = bugsnag.Notify(err,
+						bugsnag.MetaData{
+							"data": {
+								"signature": t.Signature,
+								"context":   t.Context,
+							},
+						},
+						bugsnag.User{
+							Id: fmt.Sprintf("%v", val),
+						},
+					)
+				} else {
+					_ = bugsnag.Notify(err,
+						bugsnag.MetaData{
+							"data": {
+								"signature": t.Signature,
+								"context":   t.Context,
+							},
+						})
+				}
 			}
 
 			stackFrames = stackframe.CurrentStackFrames()
