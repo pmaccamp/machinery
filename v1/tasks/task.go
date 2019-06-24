@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/pmaccamp/bugsnag-go"
 	"reflect"
 	"runtime/debug"
 
@@ -21,19 +22,21 @@ var ErrTaskPanicked = errors.New("Invoking task caused a panic")
 // Task wraps a signature and methods used to reflect task arguments and
 // return values after invoking the task
 type Task struct {
-	TaskFunc   reflect.Value
-	UseContext bool
-	Context    context.Context
-	Args       []reflect.Value
+	TaskFunc      reflect.Value
+	UseContext    bool
+	Context       context.Context
+	Args          []reflect.Value
+	BugsnagConfig *bugsnag.Configuration
 }
 
 // New tries to use reflection to convert the function and arguments
 // into a reflect.Value and prepare it for invocation
-func New(taskFunc interface{}, args []interface{}) (*Task, error) {
+func New(bugsnagConfig *bugsnag.Configuration, taskFunc interface{}, args []interface{}) (*Task, error) {
 	var taskFuncValue = reflect.ValueOf(taskFunc)
 	task := &Task{
-		TaskFunc: taskFuncValue,
-		Context:  context.Background(),
+		TaskFunc:      taskFuncValue,
+		Context:       context.Background(),
+		BugsnagConfig: bugsnagConfig,
 	}
 
 	taskFuncType := reflect.TypeOf(taskFunc)
@@ -82,6 +85,15 @@ func (t *Task) Call() (taskResults []*TaskResult, err error, stackFrames []stack
 					opentracing_log.Error(err),
 					opentracing_log.Object("stack", string(debug.Stack())),
 				)
+			}
+
+			if t.BugsnagConfig != nil {
+				bugsnag.Configure(*t.BugsnagConfig)
+				_ = bugsnag.Notify(err, bugsnag.MetaData{
+					"data": {
+						"args":    t.Args,
+						"context": t.Context,
+					}})
 			}
 
 			stackFrames = stackframe.CurrentStackFrames()

@@ -3,6 +3,7 @@ package machinery
 import (
 	"errors"
 	"fmt"
+	"github.com/pmaccamp/bugsnag-go"
 	"github.com/pmaccamp/machinery/v1/stackframe"
 	"os"
 	"os/signal"
@@ -58,10 +59,21 @@ func (worker *Worker) LaunchAsync(errorsChan chan<- error) {
 		log.INFO.Printf("  - PrefetchCount: %d", cnf.AMQP.PrefetchCount)
 	}
 
+	if cnf.BugsnagConfig != nil {
+		bugsnag.Configure(*cnf.BugsnagConfig)
+	}
+
 	// Goroutine to start broker consumption and handle retries when broker connection dies
 	go func() {
 		for {
 			retryTask, err := broker.StartConsuming(worker.ConsumerTag, worker.Concurrency, worker)
+
+			if cnf.BugsnagConfig != nil {
+				_ = bugsnag.Notify(err, bugsnag.MetaData{
+					"data": {
+						"queue": worker.Queue,
+					}})
+			}
 
 			if retryTask {
 				if worker.errorHandler != nil {
@@ -134,10 +146,17 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 	}
 
 	// Prepare task for processing
-	task, err := tasks.New(taskFunc, signature.Args)
+	task, err := tasks.New(worker.server.config.BugsnagConfig, taskFunc, signature.Args)
 	// if this failed, it means the task is malformed, probably has invalid
 	// signature, go directly to task failed without checking whether to retry
 	if err != nil {
+		if worker.server.config.BugsnagConfig != nil {
+			_ = bugsnag.Notify(err, bugsnag.MetaData{
+				"data": {
+					"queue": worker.Queue,
+				}})
+		}
+
 		_ = worker.taskFailed(signature, err, stackframe.CurrentStackFrames())
 		return err
 	}

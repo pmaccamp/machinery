@@ -11,7 +11,7 @@ import (
 // skip is number of frames to skip
 func getStack(skip int) []uintptr {
 	stack := make([]uintptr, 50) // capture 50 frames max
-	length := runtime.Callers(1+skip, stack[:])
+	length := runtime.Callers(2+skip, stack[:])
 	return stack[:length]
 }
 

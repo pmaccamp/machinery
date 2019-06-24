@@ -1,13 +1,13 @@
 package config
 
 import (
+	"cloud.google.com/go/pubsub"
 	"crypto/tls"
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/pmaccamp/bugsnag-go"
 	"strings"
 	"time"
-
-	"cloud.google.com/go/pubsub"
-	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 const (
@@ -50,6 +50,7 @@ type Config struct {
 	SQS             *SQSConfig       `yaml:"sqs"`
 	GCPPubSub       *GCPPubSubConfig `yaml:"-" ignored:"true"`
 	TLSConfig       *tls.Config
+	BugsnagConfig   *bugsnag.Configuration
 	// NoUnixSignals - when set disables signal handling in machinery
 	NoUnixSignals bool            `yaml:"no_unix_signals" envconfig:"NO_UNIX_SIGNALS"`
 	DynamoDB      *DynamoDBConfig `yaml:"dynamodb"`

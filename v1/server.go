@@ -13,7 +13,7 @@ import (
 	"github.com/pmaccamp/machinery/v1/tasks"
 	"github.com/pmaccamp/machinery/v1/tracing"
 
-	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go"
 	backendsiface "github.com/pmaccamp/machinery/v1/backends/iface"
 	brokersiface "github.com/pmaccamp/machinery/v1/brokers/iface"
 )

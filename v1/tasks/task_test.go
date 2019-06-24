@@ -17,11 +17,11 @@ func TestTaskCallErrorTest(t *testing.T) {
 	// Create test task that returns tasks.ErrRetryTaskLater error
 	retriable := func() error { return tasks.NewErrRetryTaskLater("some error", 4*time.Hour) }
 
-	task, err := tasks.New(retriable, []interface{}{})
+	task, err := tasks.New(nil, retriable, []interface{}{})
 	assert.NoError(t, err)
 
 	// Invoke TryCall and validate that returned error can be cast to tasks.ErrRetryTaskLater
-	results, err := task.Call()
+	results, err, _ := task.Call()
 	assert.Nil(t, results)
 	assert.NotNil(t, err)
 	_, ok := interface{}(err).(tasks.ErrRetryTaskLater)
@@ -30,11 +30,11 @@ func TestTaskCallErrorTest(t *testing.T) {
 	// Create test task that returns a standard error
 	standard := func() error { return errors.New("some error") }
 
-	task, err = tasks.New(standard, []interface{}{})
+	task, err = tasks.New(nil, standard, []interface{}{})
 	assert.NoError(t, err)
 
 	// Invoke TryCall and validate that returned error is standard
-	results, err = task.Call()
+	results, err, _ = task.Call()
 	assert.Nil(t, results)
 	assert.NotNil(t, err)
 	assert.Equal(t, "some error", err.Error())
@@ -68,11 +68,11 @@ func TestTaskCallInvalidArgRobustnessError(t *testing.T) {
 		{Type: "bool", Value: true},
 	}
 
-	task, err := tasks.New(f, args)
+	task, err := tasks.New(nil, f, args)
 	assert.NoError(t, err)
 
 	// Invoke TryCall and validate error handling
-	results, err := task.Call()
+	results, err, _ := task.Call()
 	assert.Equal(t, "reflect: Call using bool as type int", err.Error())
 	assert.Nil(t, results)
 }
@@ -83,10 +83,10 @@ func TestTaskCallInterfaceValuedResult(t *testing.T) {
 	// Create a test task function
 	f := func() (interface{}, error) { return math.Pi, nil }
 
-	task, err := tasks.New(f, []interface{}{})
+	task, err := tasks.New(nil, f, []interface{}{})
 	assert.NoError(t, err)
 
-	taskResults, err := task.Call()
+	taskResults, err, _ := task.Call()
 	assert.NoError(t, err)
 	assert.Equal(t, "float64", taskResults[0].Type)
 	assert.Equal(t, math.Pi, taskResults[0].Value)
@@ -99,9 +99,9 @@ func TestTaskCallWithContext(t *testing.T) {
 		assert.NotNil(t, c)
 		return math.Pi, nil
 	}
-	task, err := tasks.New(f, []interface{}{})
+	task, err := tasks.New(nil, f, []interface{}{})
 	assert.NoError(t, err)
-	taskResults, err := task.Call()
+	taskResults, err, _ := task.Call()
 	assert.NoError(t, err)
 	assert.Equal(t, "float64", taskResults[0].Type)
 	assert.Equal(t, math.Pi, taskResults[0].Value)
