@@ -3,7 +3,7 @@ package machinery
 import (
 	"errors"
 	"fmt"
-	"github.com/pmaccamp/bugsnag-go"
+	"github.com/bugsnag/bugsnag-go"
 	"github.com/pmaccamp/machinery/v1/stackframe"
 	"os"
 	"os/signal"

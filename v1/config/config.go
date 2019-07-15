@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/pmaccamp/bugsnag-go"
+	"github.com/bugsnag/bugsnag-go"
 	"strings"
 	"time"
 )

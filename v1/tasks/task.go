@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pmaccamp/bugsnag-go"
+	"github.com/bugsnag/bugsnag-go"
 	"reflect"
 	"runtime/debug"
 
