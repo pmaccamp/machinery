@@ -302,7 +302,7 @@ func (b *Backend) markTaskCompleted(signature *tasks.Signature, taskState *tasks
 		ID:        taskState.TaskUUID,
 		Status:    taskState.State,
 		Traceback: nil,
-		Result:    "",
+		Result:    taskState.Error, // default to error
 		Children:  nil,
 	}
 
