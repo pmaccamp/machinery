@@ -20,11 +20,13 @@ import (
 
 // Worker represents a single worker process
 type Worker struct {
-	server       *Server
-	ConsumerTag  string
-	Concurrency  int
-	Queue        string
-	errorHandler func(err error, signature *tasks.Signature, stackFrames []stackframe.StackFrame)
+	server               *Server
+	ConsumerTag          string
+	Concurrency          int
+	Queue                string
+	errorHandler         func(err error, signature *tasks.Signature, stackFrames []stackframe.StackFrame)
+	taskStartedCallback  func(signature *tasks.Signature)
+	taskFinishedCallback func(signature *tasks.Signature)
 }
 
 // Launch starts a new worker process. The worker subscribes
@@ -173,6 +175,10 @@ func (worker *Worker) Process(signature *tasks.Signature) error {
 		return fmt.Errorf("Set state to 'started' for task %s returned error: %s", signature.Id, err)
 	}
 
+	if worker.taskStartedCallback != nil {
+		worker.taskStartedCallback(signature)
+	}
+
 	// Call the task
 	results, err, stackFrames := task.Call()
 	if err != nil {
@@ -257,6 +263,10 @@ func (worker *Worker) taskSucceeded(signature *tasks.Signature, taskResults []*t
 		}
 
 		worker.server.SendTask(successTask)
+	}
+
+	if worker.taskFinishedCallback != nil {
+		worker.taskFinishedCallback(signature)
 	}
 
 	// If the task was not part of a group, just return
@@ -344,6 +354,10 @@ func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error, stac
 		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.Id, taskErr)
 	}
 
+	if worker.taskFinishedCallback != nil {
+		worker.taskFinishedCallback(signature)
+	}
+
 	// Trigger error callbacks
 	for _, errorTask := range signature.OnError {
 		// Pass error as a first argument to error callbacks
@@ -365,6 +379,14 @@ func (worker *Worker) hasAMQPBackend() bool {
 // A default behavior is just to log the error after all the retry attempts fail
 func (worker *Worker) SetErrorHandler(handler func(err error, signature *tasks.Signature, stackFrames []stackframe.StackFrame)) {
 	worker.errorHandler = handler
+}
+
+func (worker *Worker) SetTaskStartedCallback(callback func(signature *tasks.Signature)) {
+	worker.taskStartedCallback = callback
+}
+
+func (worker *Worker) SetTaskFinishedCallback(callback func(signature *tasks.Signature)) {
+	worker.taskFinishedCallback = callback
 }
 
 //GetServer returns server

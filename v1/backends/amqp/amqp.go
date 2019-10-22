@@ -142,12 +142,16 @@ func (b *Backend) SetStatePending(signature *tasks.Signature) error {
 // SetStateReceived updates task state to RECEIVED
 func (b *Backend) SetStateReceived(signature *tasks.Signature) error {
 	taskState := tasks.NewReceivedTaskState(signature)
+	receiveTime := time.Now()
+	signature.ReceivedTime = &receiveTime
 	return b.updateState(taskState)
 }
 
 // SetStateStarted updates task state to STARTED
 func (b *Backend) SetStateStarted(signature *tasks.Signature) error {
 	taskState := tasks.NewStartedTaskState(signature)
+	startTime := time.Now()
+	signature.StartTime = &startTime
 	return b.updateState(taskState)
 }
 
@@ -160,6 +164,13 @@ func (b *Backend) SetStateRetry(signature *tasks.Signature) error {
 // SetStateSuccess updates task state to SUCCESS
 func (b *Backend) SetStateSuccess(signature *tasks.Signature, results []*tasks.TaskResult) error {
 	taskState := tasks.NewSuccessTaskState(signature, results)
+
+	currentTime := time.Now()
+	signature.FinishTime = &currentTime
+
+	if signature.StartTime != nil {
+		signature.DurationMs = time.Since(*signature.StartTime).Milliseconds()
+	}
 
 	if err := b.updateState(taskState); err != nil {
 		return err
@@ -175,6 +186,13 @@ func (b *Backend) SetStateSuccess(signature *tasks.Signature, results []*tasks.T
 // SetStateFailure updates task state to FAILURE
 func (b *Backend) SetStateFailure(signature *tasks.Signature, err string) error {
 	taskState := tasks.NewFailureTaskState(signature, err)
+
+	currentTime := time.Now()
+	signature.FinishTime = &currentTime
+
+	if signature.StartTime != nil {
+		signature.DurationMs = time.Since(*signature.StartTime).Milliseconds()
+	}
 
 	if err := b.updateState(taskState); err != nil {
 		return err

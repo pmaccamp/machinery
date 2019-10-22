@@ -39,6 +39,10 @@ type Signature struct {
 	Task           string
 	Id             string
 	RoutingKey     string
+	ReceivedTime   *time.Time
+	StartTime      *time.Time
+	FinishTime     *time.Time
+	DurationMs     int64
 	ETA            *time.Time
 	Expires        *time.Time
 	GroupUUID      string
@@ -49,6 +53,7 @@ type Signature struct {
 	Immutable      bool
 	RetryCount     int
 	RetryTimeout   int
+	State          string
 	OnSuccess      []*Signature
 	OnError        []*Signature
 	ChordCallback  *Signature
