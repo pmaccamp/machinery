@@ -131,6 +131,14 @@ func (worker *Worker) Quit() {
 
 // Process handles received tasks and triggers success/error callbacks
 func (worker *Worker) Process(signature *tasks.Signature) error {
+	var err error = nil
+	defer func() {
+		if r := recover(); r != nil {
+			// set err and let err checks below handle logging to bugsnag and failing the task
+			err = errors.New("panic occurred when running task")
+		}
+	}()
+
 	// If the task is not registered with this worker, do not continue
 	// but only return nil as we do not want to restart the worker process
 	if !worker.server.IsTaskRegistered(signature.Task) {
